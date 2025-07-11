@@ -1,6 +1,6 @@
 # 3D Calculator Vue
 
-![3D Calculator Preview](./screenshot.jpeg)
+![3D Calculator Preview](./screenshot.jpg)
 
 A stylish 3D calculator built with Vue 3, featuring tilt animations, mouse interactivity, copy-to-clipboard, custom design, and responsive layout.
 
@@ -18,9 +18,6 @@ A stylish 3D calculator built with Vue 3, featuring tilt animations, mouse inter
 - **Input Limitations** — Prevents overflow, handles invalid input, and protects against errors.
 - **Built with Vue 3** — Uses `<script setup>` and Composition API for clean, modern code.
 
-## ✨ Screenshots
-
-![Calculator Screenshot](./screenshot.jpeg)  
 
 ## 🖥️ How to Run Locally
 
