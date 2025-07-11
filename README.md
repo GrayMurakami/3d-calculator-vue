@@ -1,5 +1,31 @@
-# Vue 3 + Vite
+# 3D Calculator Vue
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+![3D Calculator Preview](./screenshot.png)
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+A stylish 3D calculator built with Vue 3, featuring tilt animations, mouse interactivity, copy-to-clipboard, custom design, and responsive layout.
+
+## 🚀 Live Demo
+
+[View Online (Netlify)](https://3d-calculator-vue.vercel.app/)  
+
+## 🛠️ Features
+
+- **3D Tilt Animation** — The calculator visually responds to mouse movement.
+- **Standard Operations** — Addition, subtraction, multiplication, division, square root, plus/minus.
+- **Copy Result** — Copy the result to clipboard with one click (📋).
+- **Custom Design** — Dark theme, colored buttons, animated hover effects.
+- **Responsive Layout** — Works great on both desktop and mobile.
+- **Input Limitations** — Prevents overflow, handles invalid input, and protects against errors.
+- **Built with Vue 3** — Uses `<script setup>` and Composition API for clean, modern code.
+
+## ✨ Screenshots
+
+![Calculator Screenshot](./screenshot.png)  
+
+## 🖥️ How to Run Locally
+
+```bash
+git clone https://github.com/GrayMurakami/3d-calculator-vue.git
+cd 3d-calculator-vue
+npm install
+npm run dev
