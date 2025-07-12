@@ -1,249 +1,134 @@
 <template>
-  <div class="calc calc-move" v-tilt>
+  <div class="calc">
     <div class="calc-screen">
-        <p class="field">{{ display }}</p>
-        <button @click="copyResult" class="copy-btn" title="Скопировать">
-            📋
-        </button>
+      <p class="field">{{ displayValue }}</p>
+      <button @click="copyToClipboard(displayValue)" class="copy-btn" title="Copy">📋</button>
     </div>
     <div class="buttons">
-      <button class="btn clear bg-orange" @click="onBtn('C')">C</button>
-      <button class="btn del bg-orange" @click="onBtn('⌫')">⌫</button>
-      <button class="btn sqrt bg-orange" @click="onBtn('√')">√</button>
-      <button class="btn addition bg-blue" @click="onBtn('+')">+</button>
+      <button class="btn bg-orange" @click="clearAll">C</button>
+      <button class="btn bg-orange" @click="deleteLast">⌫</button>
+      <button class="btn bg-orange" @click="handleSqrt">√</button>
+      <button class="btn bg-blue" @click="setOperator('+')">+</button>
 
-      <button class="btn seven" @click="onBtn('7')">7</button>
-      <button class="btn eight" @click="onBtn('8')">8</button>
-      <button class="btn nine" @click="onBtn('9')">9</button>
-      <button class="btn subtraction bg-blue" @click="onBtn('-')">-</button>
+      <button class="btn" @click="inputDigit('7')">7</button>
+      <button class="btn" @click="inputDigit('8')">8</button>
+      <button class="btn" @click="inputDigit('9')">9</button>
+      <button class="btn bg-blue" @click="setOperator('-')">-</button>
 
-      <button class="btn four" @click="onBtn('4')">4</button>
-      <button class="btn five" @click="onBtn('5')">5</button>
-      <button class="btn six" @click="onBtn('6')">6</button>
-      <button class="btn multiply bg-blue" @click="onBtn('×')">×</button>
+      <button class="btn" @click="inputDigit('4')">4</button>
+      <button class="btn" @click="inputDigit('5')">5</button>
+      <button class="btn" @click="inputDigit('6')">6</button>
+      <button class="btn bg-blue" @click="setOperator('×')">×</button>
 
-      <button class="btn one" @click="onBtn('1')">1</button>
-      <button class="btn two" @click="onBtn('2')">2</button>
-      <button class="btn three" @click="onBtn('3')">3</button>
-      <button class="btn division bg-blue" @click="onBtn('÷')">÷</button>
+      <button class="btn" @click="inputDigit('1')">1</button>
+      <button class="btn" @click="inputDigit('2')">2</button>
+      <button class="btn" @click="inputDigit('3')">3</button>
+      <button class="btn bg-blue" @click="setOperator('÷')">÷</button>
 
-      <button class="btn plus-minus bg-orange" @click="onBtn('+/-')">+/-</button>
-      <button class="btn zero" @click="onBtn('0')">0</button>
-      <button class="btn point bg-orange" @click="onBtn('.')">.</button>
-      <button class="btn result bg-blue" @click="onBtn('=')">=</button>
+      <button class="btn bg-orange" @click="toggleSign">+/-</button>
+      <button class="btn" @click="inputDigit('0')">0</button>
+      <button class="btn bg-orange" @click="inputDigit('.')">.</button>
+      <button class="btn bg-blue" @click="calculateResult">=</button>
     </div>
     <b><p class="author">&copy; 2025 GraY</p></b>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import vTilt from '../directives/tilt.js'
+import { ref, computed } from 'vue'
+import { useClipboard } from '@vueuse/core'
 
-// Логика калькулятора:
-const display = ref('0')
+const maxLength = 9
 
-let a = ''
-let b = ''
-let operation = ''
-let finish = false
-const decimalePlaces = 4
-const maxLength = 7
+const firstValue = ref('0')      // первое число (строка для простоты)
+const secondValue = ref('')      // второе число (строка)
+const operator = ref('')         // текущий оператор
+const isSecondValueInput = ref(false) // флаг, что вводим второе число
 
-function copyResult() {
-  navigator.clipboard.writeText(display.value)
-    .then(() => {
-      // Можно добавить уведомление об успехе
-      // alert('Скопировано!');
-    })
-    .catch(err => {
-      // Обработка ошибки (например, alert)
-      alert('Ошибка копирования');
-    });
+const { copy: copyToClipboard } = useClipboard() // функция для копирования
+
+// computed значение, всегда отображаемое на экране
+const displayValue = computed(() => {
+  if (isSecondValueInput.value) return secondValue.value || '0'
+  return firstValue.value || '0'
+})
+
+// Ввод цифр и точки
+function inputDigit(digit) {
+  let target = isSecondValueInput.value ? secondValue : firstValue
+  // Ограничение длины
+  if (target.value.length >= maxLength && digit !== '.') return
+  // Одна точка
+  if (digit === '.' && target.value.includes('.')) return
+  // Нельзя начинать с нескольких нулей
+  if (target.value === '0' && digit !== '.') target.value = digit
+  else target.value += digit
 }
 
-function clearCalculator() {
-  a = ''
-  b = ''
-  operation = ''
-  finish = false
-  display.value = '0'
-}
-
-function handleDelete() {
-  if (finish) {
-    a = a.slice(0, -1)
-    display.value = a || '0'
-    if (a === '') finish = false
-  } else if (operation === '') {
-    a = a.slice(0, -1)
-    display.value = a || '0'
-  } else {
-    b = b.slice(0, -1)
-    display.value = b || '0'
+// Операции + - × ÷
+function setOperator(op) {
+  // Если оператор уже выбран и второе число есть — считаем, результат переносим в первое число
+  if (operator.value && secondValue.value) {
+    calculateResult()
   }
+  operator.value = op
+  isSecondValueInput.value = true
 }
 
-function onBtn(val) {
-  if (val === 'C') return clearCalculator()
-  if (val === '⌫') return handleDelete()
-  if (val === '√') return handleSquareRoot()
-  if (val === '+/-') return handleToggleSign()
-  if (val === '=') return handleEqual()
-  if (['+', '-', '×', '÷'].includes(val)) return handleOperationInput(val)
-  // цифры и точка
-  return handleNumberInput(val)
+// Кнопка =
+function calculateResult() {
+  let a = parseFloat(firstValue.value)
+  let b = parseFloat(secondValue.value || firstValue.value) // если второй нет — считаем само с собой
+  let result = 0
+  switch (operator.value) {
+    case '+': result = a + b; break
+    case '-': result = a - b; break
+    case '×': result = a * b; break
+    case '÷': result = b === 0 ? 'Error' : a / b; break
+    default: return
+  }
+  // Красиво округляем, ошибки и длинные числа — в экспоненту
+  let resultStr = (result === 'Error') ? 'Error' : +parseFloat(result).toFixed(8)
+  resultStr = String(resultStr)
+  if (resultStr.length > maxLength) resultStr = (+resultStr).toExponential(4)
+  firstValue.value = resultStr
+  secondValue.value = ''
+  operator.value = ''
+  isSecondValueInput.value = false
 }
 
+// C
+function clearAll() {
+  firstValue.value = '0'
+  secondValue.value = ''
+  operator.value = ''
+  isSecondValueInput.value = false
+}
 
-function handleNumberInput(val) {
-  // Если только что был равенство (=), начать новый ввод
-  if (finish) {
-    a = val === '.' ? '0.' : val // поддержка десятичной точки
-    b = ''
-    operation = ''
-    finish = false
-    display.value = a
+// ⌫
+function deleteLast() {
+  let target = isSecondValueInput.value ? secondValue : firstValue
+  target.value = target.value.slice(0, -1) || '0'
+}
+
+// √
+function handleSqrt() {
+  let target = isSecondValueInput.value ? secondValue : firstValue
+  let num = parseFloat(target.value)
+  if (isNaN(num) || num < 0) {
+    target.value = 'Error'
     return
   }
-  if (operation === '') {
-    a = handleInput(a, val)
-    display.value = a
-  } else {
-    b = handleInput(b, val)
-    display.value = b
-  }
+  let sqrtVal = Math.sqrt(num).toFixed(8)
+  sqrtVal = +sqrtVal
+  target.value = String(sqrtVal).length > maxLength ? sqrtVal.toExponential(4) : String(sqrtVal)
 }
 
-
-function handleInput(currentValue, val) {
-  if (currentValue.length >= maxLength && !(val === '.' && !currentValue.includes('.'))) {
-    return currentValue
-  }
-  if (val === '.' && currentValue.includes('.')) return currentValue
-  if (currentValue === '0' && val !== '.') return val
-  return currentValue + val
-}
-
-function handleOperationInput(val) {
-  if (a !== '' && b === '') {
-    operation = val
-    display.value = operation
-  } else if (a !== '' && b !== '') {
-    const result = calculateResult()
-    if (result !== 'Error') {
-      a = result
-      b = ''
-    }
-    operation = val
-    finish = false
-  }
-}
-
-function handleEqual() {
-  if (a !== '' && b !== '' && operation !== '') {
-    const result = calculateResult()
-    if (result !== 'Error') {
-      a = result
-    }
-    b = ''
-    operation = ''
-    finish = true
-  }
-}
-
-function calculateResult() {
-  let res = calculate(a, b, operation)
-  res = (res !== 'Error' && !isNaN(res))
-    ? Number(parseFloat(res).toFixed(decimalePlaces))
-    : 'Error'
-
-  res = res.toString()
-  if (res.length > maxLength) {
-    let number = parseFloat(res)
-    if (Math.abs(number) >= 1e8 || Math.abs(number) < 1e-4) {
-      res = number.toExponential(decimalePlaces - 2)
-    } else {
-      let integerPartLength = Math.floor(number).toString().length
-      if (integerPartLength >= maxLength) {
-        res = number.toExponential(decimalePlaces - 2)
-      } else {
-        let allowedDecimalPlaces = maxLength - integerPartLength - 1
-        res = number.toFixed(allowedDecimalPlaces)
-      }
-    }
-  }
-  if (res.indexOf('.') !== -1) {
-    res = res.replace(/\.?0+$/, '')
-  }
-  display.value = res === 'Error' ? 'Error' : res
-  return res
-}
-
-function handleSquareRoot() {
-  if (finish) {
-    a = calculateSquareRoot(a)
-    display.value = a
-    finish = false
-    b = ''
-    operation = ''
-  } else if (operation === '') {
-    a = calculateSquareRoot(a)
-    display.value = a
-  } else if (b !== '') {
-    b = calculateSquareRoot(b)
-    display.value = b
-  }
-}
-
-function calculateSquareRoot(val) {
-  const number = parseFloat(val)
-  if (isNaN(number)) return 'Error'
-  let result = number >= 0 ? Math.sqrt(number) : 'Error'
-  if (typeof result === 'number') {
-    result = result.toFixed(decimalePlaces)
-    result = parseFloat(result).toString()
-  }
-  return result
-}
-
-function handleToggleSign() {
-  if (b === '' && operation === '') {
-    a = toggleSign(a)
-    display.value = a
-  } else if (a !== '' && b !== '') {
-    b = toggleSign(b)
-    display.value = b
-  }
-}
-
-function toggleSign(value) {
-  return (-parseFloat(value)).toString()
-}
-
-function addition(a, b) {
-  return (+a) + (+b)
-}
-function subtraction(a, b) {
-  return a - b
-}
-function multiply(a, b) {
-  return a * b
-}
-function division(a, b) {
-  return b === 0 ? 'Error' : a / b
-}
-function calculate(a, b, op) {
-  a = parseFloat(a)
-  b = parseFloat(b)
-  let result = null
-  switch (op) {
-    case '+': result = addition(a, b); break
-    case '-': result = subtraction(a, b); break
-    case '×': result = multiply(a, b); break
-    case '÷': result = b === 0 ? 'Error' : division(a, b); break
-    default: break
-  }
-  return result
+// +/-
+function toggleSign() {
+  let target = isSecondValueInput.value ? secondValue : firstValue
+  if (target.value === '0' || target.value === '') return
+  if (target.value.startsWith('-')) target.value = target.value.slice(1)
+  else target.value = '-' + target.value
 }
 </script>
