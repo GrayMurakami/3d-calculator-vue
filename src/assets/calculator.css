@@ -175,13 +175,3 @@ body {
     font-size: 22px;
     margin-top: 45px;
 }
-
-@media (max-width: 600px) {
-  .calc {
-    width: 98vw;
-    min-width: unset;
-    max-width: 400px;
-    padding: 8px;
-    height: auto;
-  }
-}
