@@ -40,8 +40,8 @@ import { useClipboard } from '@vueuse/core'
 
 const maxLength = 9
 
-const firstValue = ref('0')      // первое число (строка для простоты)
-const secondValue = ref('')      // второе число (строка)
+const firstValue = ref('0')      // первое число
+const secondValue = ref('')      // второе число
 const operator = ref('')         // текущий оператор
 const isSecondValueInput = ref(false) // флаг, что вводим второе число
 
@@ -87,7 +87,7 @@ function calculateResult() {
     case '÷': result = b === 0 ? 'Error' : a / b; break
     default: return
   }
-  // Красиво округляем, ошибки и длинные числа — в экспоненту
+  // Oкругляем, ошибки и длинные числа — в экспоненту
   let resultStr = (result === 'Error') ? 'Error' : +parseFloat(result).toFixed(8)
   resultStr = String(resultStr)
   if (resultStr.length > maxLength) resultStr = (+resultStr).toExponential(4)
@@ -132,3 +132,102 @@ function toggleSign() {
   else target.value = '-' + target.value
 }
 </script>
+
+<style scopped>
+.calc {
+  margin: 50px auto;
+  width: 300px;
+  height: 500px;
+  border: 2px solid red;
+  background: black;
+  border-radius: 25px;
+  font-family: Arial, Helvetica, sans-serif;
+  padding: 18px;
+  color: aliceblue;
+  box-shadow:
+    1px 1px 1px #ccc,
+    1px 1px 1px #c9c9c9,
+    1px 1px 1px #bbb,
+    1px 1px 1px #b9b9b9,
+    1px 1px 1px #aaa,
+    0 6px 1px rgba(0,0,0,.1),
+    0 0 5px rgba(0,0,0,.1),
+    0 1px 3px rgba(0,0,0,.3),
+    0 3px 5px rgba(0,0,0,.2),
+    0 5px 10px rgba(0,0,0,.25),
+    0 10px 10px rgba(0,0,0,.2),
+    0 20px 20px rgba(0,0,0,.15),
+    0 1px 3px rgba(0, 0, 0, 0.1), 
+    0 1px 5px rgba(0, 0, 0, 0.15),
+    0 2px 10px rgba(0, 0, 0, 0.2),
+    0 4px 15px rgba(0, 0, 0, 0.25),
+    0 6px 20px rgba(0, 0, 0, 0.3),
+    0 8px 25px rgba(0, 0, 0, 0.35),
+    0 12px 30px rgba(0, 0, 0, 0.4),
+    0 15px 40px rgba(0, 0, 0, 0.45),
+    0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.calc-move {
+  transform: rotateX(var(--mouseY)) rotateY(var(--mouseX));
+  transition: transform 0.1s ease-out;
+}
+
+.calc-screen {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: 60px;
+  position: relative;
+}
+
+.field {
+  height: 40px;
+  padding: 10px;
+  display: grid;
+  margin-top: 15px;
+  font-size: 4rem;
+  justify-items: end;
+  align-items: end;
+}
+
+.copy-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5em;
+  color: #fff;
+  margin-top: 10px;
+  transition: color 0.2s, transform 0.15s;
+  padding: 4px;
+  border-radius: 6px;
+  box-shadow: 0 0 0 transparent;
+  &:hover {
+    color: orange;
+    transform: scale(1.15) rotate(-6deg);
+    background: rgba(255,255,255,0.06);
+    box-shadow: 0 0 6px 0 orange;
+  }
+}
+
+.buttons {
+  display: grid;
+  grid-template-areas: 
+    "clear del sqrt addition"
+    "seven eight nine subtraction"
+    "four five six multiply"
+    "one two three division"
+    "plus-minus zero point result";
+  grid-gap: 10px;
+  justify-items: center;
+  padding-top: 10px;
+}
+
+.author {
+  text-align: right;
+  text-shadow: 1px 1px 1px red;
+  color: rgb(0, 234, 255);
+  font-size: 22px;
+  margin-top: 45px;
+}
+</style>
