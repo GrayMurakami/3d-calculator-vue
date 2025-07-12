@@ -179,28 +179,9 @@ body {
 @media (max-width: 600px) {
   .calc {
     width: 98vw;
-    height: auto;
-    min-height: 300px;
+    min-width: unset;
+    max-width: 400px;
     padding: 8px;
-  }
-  .calc-screen {
-    min-height: 40px;
-    padding: 0 4vw;
-  }
-  .field {
-    font-size: 2rem;
-    padding: 5px;
-    margin-top: 8px;
-    height: 30px;
-  }
-  .btn {
-    width: 36px;
-    height: 36px;
-    font-size: 1rem;
-    line-height: 36px;
-  }
-  .author {
-    font-size: 14px;
-    margin-top: 16px;
+    height: auto;
   }
 }
