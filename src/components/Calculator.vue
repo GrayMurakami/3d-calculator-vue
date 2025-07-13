@@ -133,7 +133,7 @@ function toggleSign() {
 }
 </script>
 
-<style scopped>
+<style scoped>
 .calc {
   margin: 50px auto;
   width: 300px;
