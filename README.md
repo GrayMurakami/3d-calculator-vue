@@ -6,7 +6,7 @@ A stylish 3D calculator built with Vue 3, featuring tilt animations, mouse inter
 
 ## 🚀 Live Demo
 
-[View Online (Netlify)](https://3d-calculator-vue.vercel.app/)  
+[View Online (Netlify)](https://vuenuxt-calc-bygray.app/)  
 
 ## 🛠️ Features
 
