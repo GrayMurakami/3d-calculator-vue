@@ -21,7 +21,7 @@ const classes = computed(() =>
 )
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .btn {
   color: aliceblue;
   width: 50px;
